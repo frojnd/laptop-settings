@@ -1,0 +1,11 @@
+ frojnd: I assume it's because you had the DynamicLog writing to
+ a pipe and nothing was using that pipe
+ *waiters
+ there's the robot noodle making robots
+ etc etc
+ i see a pattern, oh my gawd ww3 imminent
+ Earnestly: tnx
+ frojnd: Another solution was to actually cat the file somewhere
+ in the /proc fs
+ frojnd: Just to "flush" its contents
+

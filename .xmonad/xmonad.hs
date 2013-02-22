@@ -1,0 +1,63 @@
+import XMonad
+
+import XMonad.Util.Run
+import XMonad.Util.EZConfig
+
+import XMonad.Layout.Renamed
+import XMonad.Layout.NoBorders
+import XMonad.Layout.ResizableTile
+
+import XMonad.Hooks.DynamicLog
+-- import XMonad.Hooks.UrgencyHook
+import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers
+
+main = xmonad =<< statusBar myBar myCustomPP myToggleStruct myConfig
+
+myBar                = "xmobar"
+myModMask            = mod4Mask
+myTerminal           = "urxvt"
+myWorkspaces         = ["term", "www", "dev", "media", "games", "base"]
+myBorderWidth        = 2
+myNormalBorderColor  = "#333333"
+myFocusedBorderColor = "#6666CC"
+
+myToggleStruct XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
+
+myManageHook = composeAll
+  [ isFullscreen           --> doFullFloat
+  , appName =? "Navigator" --> doShift "www"
+  ]
+
+myLayoutHook = tile ||| mtile ||| full
+  where
+    rt    = ResizableTall 1 (2/200) (1/2) []
+    full  = renamed [Replace "[F]"] $ noBorders Full
+    tile  = renamed [Replace "[T]"] $ smartBorders rt
+    mtile = renamed [Replace "[M]"] $ smartBorders $ Mirror rt
+
+myCustomPP = xmobarPP
+  { ppCurrent         = xmobarColor "#170F0D" "#746C48" . pad
+  , ppHidden          = xmobarColor "#BBBBBB" "#170F0D" . pad
+  , ppHiddenNoWindows = xmobarColor "#746C48" "#170F0D" . pad
+  , ppLayout          = xmobarColor "#A0A57E" "#170F0D"
+  }
+
+myConfig = defaultConfig
+  { terminal           = myTerminal
+  , modMask            = myModMask
+  , borderWidth        = myBorderWidth
+  , workspaces         = myWorkspaces
+  , normalBorderColor  = myNormalBorderColor
+  , focusedBorderColor = myFocusedBorderColor
+  , manageHook         = myManageHook
+  , layoutHook         = myLayoutHook
+  } `additionalKeysP`
+  [ ("M-<Space>",   spawn "chromium")
+  , ("M-u",         spawn "termite")
+  , ("M-c",         spawn "./scripts/dmenu_pdf")
+  , ("M-q",         kill)
+  , ("M-r",         spawn "xmonad --restart")
+  , ("M-S-r",       spawn "xmonad --recompile; xmonad --restart")
+  , ("M-S-<Space>", sendMessage NextLayout)
+  ]
